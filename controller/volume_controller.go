@@ -3801,6 +3801,8 @@ func (c *VolumeController) processMigration(v *longhorn.Volume, es map[string]*l
 			e := extras[i]
 			if e.DeletionTimestamp == nil {
 				if err := c.deleteEngine(e, es); err != nil {
+					// rollback the new engine status so we could processMigration again
+					currentEngine.Spec.Active = false
 					return err
 				}
 				log.Infof("Removing extra engine %v after switching the current engine to %v", e.Name, currentEngine.Name)
